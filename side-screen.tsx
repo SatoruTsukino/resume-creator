@@ -659,23 +659,18 @@ export default function SideScreen({
 
           <SidebarSection
             className="bg-[linear-gradient(135deg,rgba(239,246,255,0.95)_0%,rgba(245,243,255,0.95)_100%)]"
-            description="Paste any plain-text version of a resume and let Gemini map it into editable sections."
             eyebrow="AI Assist"
             icon={Sparkles}
-            title="Gemini Resume Processor"
+            title="Process with Gemini"
           >
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="h-5 w-5 text-purple-600" />
-          <h3 className="font-bold text-gray-800">AI Resume Processor</h3>
-        </div>
         <Label htmlFor="resume-text" className="text-sm font-medium mb-2 block">
-          Paste your resume text (any format)
+          Paste resume text
         </Label>
         <Textarea
           id="resume-text"
           value={resumeText}
           onChange={(e) => setResumeText(e.target.value)}
-          placeholder="Paste your complete resume text here (markdown, plain text, etc.)..."
+          placeholder="Paste your complete resume text here..."
           className="w-full h-32 mb-3 text-sm"
         />
         <Button
@@ -695,7 +690,6 @@ export default function SideScreen({
             </>
           )}
         </Button>
-        <p className="text-xs text-gray-600 mt-2">AI will parse your resume and structure it automatically</p>
           </SidebarSection>
 
           <SidebarSection

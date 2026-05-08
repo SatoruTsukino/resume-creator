@@ -89,7 +89,7 @@ export default function ResumePage() {
     technicalStack: [],
   })
   const [printSettings, setPrintSettings] = useState({
-    margin: 20,
+    margin: 96,
     fontSize: 11,
     headingFontSize: 22,
     sectionHeadingFontSize: 14,
@@ -163,10 +163,10 @@ export default function ResumePage() {
             <div
               className={
                 skillsColumns === 1
-                  ? "space-y-1"
+                  ? "grid grid-cols-1 gap-y-1"
                   : skillsColumns === 2
-                    ? "grid grid-cols-2 gap-x-4 space-y-1"
-                    : "grid grid-cols-3 gap-x-3 space-y-1"
+                    ? "grid grid-cols-2 gap-x-4 gap-y-1"
+                    : "grid grid-cols-3 gap-x-3 gap-y-1"
               }
             >
               {sections.coreCompetencies.map((competency, index) => (

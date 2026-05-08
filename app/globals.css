@@ -95,6 +95,12 @@
   display: inline-block;
 }
 
+.resume-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
 .overflow-auto::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -131,6 +137,10 @@
     margin: 0 !important;
     box-shadow: none;
     page-break-inside: auto;
+  }
+
+  .resume-pages {
+    gap: 0 !important;
   }
 
   .resume-wrapper {
