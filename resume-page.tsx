@@ -817,68 +817,6 @@ export default function ResumePage() {
         setSkillsColumns={setSkillsColumns}
       />
 
-      <style jsx global>{`
-        .resume-wrapper {
-          display: inline-block;
-        }
-        
-        @media print {
-          @page {
-            size: letter;
-            margin: 0;
-          }
-          html, body {
-            margin: 0;
-            padding: 0;
-          }
-          .page-content {
-            width: 8.5in !important;
-            margin: 0 !important;
-            padding: ${printSettings.margin}px !important;
-            box-shadow: none;
-            page-break-inside: auto;
-          }
-          .resume-wrapper {
-            transform: none !important;
-            margin: 0 !important;
-          }
-          .page-break-inside-avoid {
-            page-break-inside: avoid;
-          }
-          .page-content h1 {
-            font-size: ${printSettings.headingFontSize}px !important;
-          }
-          .page-content h3 {
-            font-size: ${printSettings.sectionHeadingFontSize}px !important;
-          }
-          .page-content h4 {
-            font-size: ${printSettings.fontSize + 1}px !important;
-          }
-          .page-content p {
-            font-size: ${printSettings.fontSize}px !important;
-          }
-          .page-content span {
-            font-size: ${printSettings.bulletFontSize}px !important;
-          }
-        }
-        
-        /* Hide scrollbars but keep functionality */
-        .overflow-auto::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-        .overflow-auto::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 4px;
-        }
-        .overflow-auto::-webkit-scrollbar-thumb {
-          background: #c1c1c1;
-          border-radius: 4px;
-        }
-        .overflow-auto::-webkit-scrollbar-thumb:hover {
-          background: #a8a8a8;
-        }
-      `}</style>
     </div>
   )
 }

@@ -147,6 +147,7 @@ export default function SideScreen({
   skillsColumns = 1,
   setSkillsColumns,
 }: SideScreenProps) {
+  const REQUEST_TIMEOUT_MS = 30000
   const [savedData, setSavedData] = useState<{
     header: SideScreenProps["header"]
     sections: SideScreenProps["sections"]
@@ -194,13 +195,19 @@ export default function SideScreen({
     }
 
     setIsProcessing(true)
+    let timeoutId: number | undefined
+
     try {
+      const controller = new AbortController()
+      timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+
       const response = await fetch("/api/process-resume", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ resumeText }),
+        signal: controller.signal,
       })
 
       const isJson = response.headers.get("content-type")?.includes("application/json")
@@ -266,12 +273,22 @@ export default function SideScreen({
       }
     } catch (error) {
       console.error("Error processing resume:", error)
+      const errorMessage =
+        error instanceof Error && error.name === "AbortError"
+          ? "The request timed out. Please try again."
+          : error instanceof Error
+            ? error.message
+            : "Failed to process resume. Please try again."
+
       toast({
         title: "Processing failed",
-        description: error instanceof Error ? error.message : "Failed to process resume. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       })
     } finally {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId)
+      }
       setIsProcessing(false)
     }
   }
