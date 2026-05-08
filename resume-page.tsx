@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { ChevronRight, ChevronLeft } from "lucide-react"
 import ResumeDownload from "./resume-download"
 import SideScreen from "./side-screen"
 import { Slider } from "@/components/ui/slider"
@@ -745,13 +744,6 @@ export default function ResumePage() {
 
   return (
     <div className="min-h-screen min-w-max w-full bg-gray-100 flex">
-      {/* Sidebar Toggle Button */}
-      <div className={`fixed top-4 ${sidebarOpen ? "left-[320px]" : "left-4"} z-50 transition-all duration-300`}>
-        <Button onClick={toggleSidebar} variant="outline" size="sm" className="bg-white shadow-md">
-          {sidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-        </Button>
-      </div>
-
       {/* Main Content Area */}
       <div className={`flex-1 p-8 transition-all duration-300 ${sidebarOpen ? "ml-[320px]" : "ml-0"}`}>
         <div className="max-w-none mx-auto flex justify-center">

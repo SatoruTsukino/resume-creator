@@ -5,10 +5,29 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Plus, Minus, Save, ChevronLeft, ChevronUp, ChevronDown, Sparkles, Loader2 } from "lucide-react"
+import {
+  Plus,
+  Minus,
+  Save,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronDown,
+  Sparkles,
+  Loader2,
+  Palette,
+  LayoutPanelTop,
+  UserRound,
+  BriefcaseBusiness,
+  GraduationCap,
+  Award,
+  FolderKanban,
+  SlidersHorizontal,
+} from "lucide-react"
 import { Slider } from "@/components/ui/slider"
 import { useState } from "react"
 import { toast } from "@/components/ui/use-toast"
+import { cn } from "@/lib/utils"
 
 type SideScreenProps = {
   accentColor: string
@@ -83,6 +102,45 @@ type SideScreenProps = {
   setSkillsColumns: React.Dispatch<React.SetStateAction<number>>
 }
 
+type SidebarSectionProps = {
+  children: React.ReactNode
+  className?: string
+  description?: string
+  eyebrow?: string
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+}
+
+function SidebarSection({
+  children,
+  className,
+  description,
+  eyebrow,
+  icon: Icon,
+  title,
+}: SidebarSectionProps) {
+  return (
+    <section
+      className={cn(
+        "rounded-[24px] border border-slate-200/80 bg-white/88 p-4 shadow-[0_14px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm",
+        className
+      )}
+    >
+      <div className="mb-4 flex items-start gap-3">
+        <div className="mt-0.5 rounded-2xl bg-slate-100 p-2.5 text-slate-700">
+          <Icon className="h-4 w-4" />
+        </div>
+        <div className="min-w-0">
+          {eyebrow && <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{eyebrow}</p>}
+          <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+          {description && <p className="mt-1 text-sm leading-5 text-slate-500">{description}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
+  )
+}
+
 export default function SideScreen({
   accentColor = "#98C1B6",
   setAccentColor,
@@ -148,6 +206,12 @@ export default function SideScreen({
   setSkillsColumns,
 }: SideScreenProps) {
   const REQUEST_TIMEOUT_MS = 30000
+  const controlInputClass =
+    "rounded-xl border-slate-200 bg-white shadow-sm transition focus-visible:ring-slate-300"
+  const softButtonClass =
+    "rounded-xl border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900"
+  const iconActionClass =
+    "h-8 w-8 rounded-lg border-slate-200 bg-white p-0 text-slate-600 shadow-sm hover:bg-slate-50 hover:text-slate-900"
   const [savedData, setSavedData] = useState<{
     header: SideScreenProps["header"]
     sections: SideScreenProps["sections"]
@@ -557,31 +621,49 @@ export default function SideScreen({
   }
 
   if (!isOpen) {
-    return null
+    return (
+      <div className="fixed left-4 top-4 z-50">
+        <Button onClick={onToggle} variant="outline" size="sm" className="bg-white shadow-md">
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    )
   }
 
   return (
-    <div className="w-[320px] bg-gray-100 p-4 overflow-y-auto h-screen fixed left-0 top-0 border-r border-gray-200 transition-all duration-300 z-40">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Resume Editor</h2>
-        <Button onClick={onToggle} size="sm" variant="ghost">
+    <div className="fixed left-0 top-0 z-40 h-screen w-[340px] border-r border-slate-200/80 bg-[linear-gradient(180deg,#f7f7f4_0%,#eef3f2_40%,#f7f8fb_100%)] shadow-[18px_0_50px_rgba(15,23,42,0.08)] transition-all duration-300">
+      <div className="absolute top-4 right-4 z-50">
+        <Button onClick={onToggle} variant="outline" size="sm" className="rounded-xl border-slate-200 bg-white shadow-md">
           <ChevronLeft className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="mb-4 flex gap-2">
-        <Button onClick={saveCurrentText} className="flex-1 bg-transparent" variant="outline">
-          <Save className="h-4 w-4 mr-2" /> Save Text
-        </Button>
-        {savedData && (
-          <Button onClick={restoreSavedText} className="flex-1 bg-transparent" variant="outline">
-            Restore Text
-          </Button>
-        )}
-      </div>
+      <div className="h-full overflow-y-auto px-4 pb-10 pt-4">
+        <div className="space-y-5 pr-1">
+          <section className="rounded-[28px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(233,244,241,0.94)_100%)] p-5 shadow-[0_18px_50px_rgba(15,23,42,0.1)] backdrop-blur">
+           
+            <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+              {savedData && <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 shadow-sm">Draft saved</span>}
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Button onClick={saveCurrentText} className="flex-1 rounded-xl bg-slate-900 text-white hover:bg-slate-800">
+                <Save className="h-4 w-4 mr-2" /> Save Draft
+              </Button>
+              {savedData && (
+                <Button onClick={restoreSavedText} className={cn("flex-1 rounded-xl", softButtonClass)} variant="outline">
+                  Restore
+                </Button>
+              )}
+            </div>
+          </section>
 
-      {/* AI Resume Processing Section */}
-      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border">
+          <SidebarSection
+            className="bg-[linear-gradient(135deg,rgba(239,246,255,0.95)_0%,rgba(245,243,255,0.95)_100%)]"
+            description="Paste any plain-text version of a resume and let Gemini map it into editable sections."
+            eyebrow="AI Assist"
+            icon={Sparkles}
+            title="Gemini Resume Processor"
+          >
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="h-5 w-5 text-purple-600" />
           <h3 className="font-bold text-gray-800">AI Resume Processor</h3>
@@ -599,7 +681,7 @@ export default function SideScreen({
         <Button
           onClick={processResumeWithGemini}
           disabled={isProcessing || !resumeText.trim()}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+          className="w-full rounded-xl bg-gradient-to-r from-sky-600 via-cyan-600 to-emerald-600 text-white shadow-lg shadow-cyan-200 hover:from-sky-700 hover:via-cyan-700 hover:to-emerald-700"
         >
           {isProcessing ? (
             <>
@@ -614,38 +696,53 @@ export default function SideScreen({
           )}
         </Button>
         <p className="text-xs text-gray-600 mt-2">AI will parse your resume and structure it automatically</p>
-      </div>
+          </SidebarSection>
 
-      <div className="mb-4">
-        <Label htmlFor="accent-color">Accent Color</Label>
-        <Input
-          id="accent-color"
-          type="color"
-          value={accentColor}
-          onChange={(e) => setAccentColor(e.target.value)}
-          className="w-full"
-        />
-      </div>
+          <SidebarSection
+            description="Control hierarchy, visual tone, and how key sections appear in the document."
+            eyebrow="Layout"
+            icon={LayoutPanelTop}
+            title="Structure & Styling"
+          >
+            <div className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-2xl border border-slate-200/70 bg-slate-50/80 p-3">
+              <div>
+                <Label htmlFor="accent-color" className="text-sm font-medium text-slate-700">Accent Color</Label>
+                <p className="mt-1 text-xs text-slate-500">Used for headings and key moments.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-8 w-8 rounded-full border border-white shadow-sm" style={{ backgroundColor: accentColor }} />
+                <Input
+                  id="accent-color"
+                  type="color"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  className="h-10 w-14 cursor-pointer rounded-xl border-slate-200 bg-white p-1 shadow-sm"
+                />
+              </div>
+            </div>
 
-      <div className="mb-4">
-        <h3 className="font-bold mt-4 mb-2">Section Order & Visibility</h3>
+            <div className="mt-4">
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-slate-800">Section Order & Visibility</h4>
+                <span className="text-xs uppercase tracking-[0.14em] text-slate-400">Toggle + reorder</span>
+              </div>
         <div className="space-y-2">
           {sectionOrder.map((sectionKey, index) => (
-            <div key={sectionKey} className="flex items-center gap-2 p-2 bg-white rounded border">
+            <div key={sectionKey} className="flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/90 p-3 shadow-sm">
               <input
                 type="checkbox"
                 checked={sectionVisibility[sectionKey as keyof typeof sectionVisibility]}
                 onChange={(e) => setSectionVisibility((prev) => ({ ...prev, [sectionKey]: e.target.checked }))}
-                className="w-4 h-4"
+                className="h-4 w-4 rounded border-slate-300 text-slate-900"
               />
-              <span className="flex-1 text-sm">{sectionNames[sectionKey as keyof typeof sectionNames]}</span>
+              <span className="flex-1 text-sm font-medium text-slate-700">{sectionNames[sectionKey as keyof typeof sectionNames]}</span>
               <div className="flex gap-1">
                 <Button
                   onClick={() => moveSectionUp(index)}
                   size="sm"
                   variant="outline"
                   disabled={index === 0}
-                  className="p-1 h-6 w-6"
+                  className={iconActionClass}
                 >
                   <ChevronUp className="h-3 w-3" />
                 </Button>
@@ -654,7 +751,7 @@ export default function SideScreen({
                   size="sm"
                   variant="outline"
                   disabled={index === sectionOrder.length - 1}
-                  className="p-1 h-6 w-6"
+                  className={iconActionClass}
                 >
                   <ChevronDown className="h-3 w-3" />
                 </Button>
@@ -662,10 +759,13 @@ export default function SideScreen({
             </div>
           ))}
         </div>
-      </div>
+            </div>
 
-      <div className="mb-4">
-        <h3 className="font-bold mt-4 mb-2">Skills Layout</h3>
+            <div className="mt-4">
+              <div className="mb-2 flex items-center gap-2">
+                <Palette className="h-4 w-4 text-slate-500" />
+                <h4 className="text-sm font-semibold text-slate-800">Skills Layout</h4>
+              </div>
         <div className="flex gap-2">
           {[1, 2, 3].map((cols) => (
             <Button
@@ -673,71 +773,79 @@ export default function SideScreen({
               onClick={() => setSkillsColumns(cols)}
               size="sm"
               variant={skillsColumns === cols ? "default" : "outline"}
-              className="flex-1"
+              className={cn(
+                "flex-1 rounded-xl",
+                skillsColumns === cols ? "bg-slate-900 text-white hover:bg-slate-800" : softButtonClass
+              )}
             >
               {cols} Col
             </Button>
           ))}
         </div>
-      </div>
+            </div>
+          </SidebarSection>
 
-      <div className="mb-4">
-        <h3 className="font-bold mt-4 mb-2">Header</h3>
+          <SidebarSection
+            description="Shape the top block and reorder the contact details exactly how they should appear."
+            eyebrow="Identity"
+            icon={UserRound}
+            title="Header & Contact"
+          >
         <Input
           value={header.name}
           onChange={(e) => handleHeaderChange("name", e.target.value)}
           placeholder="Name"
-          className="mb-2"
+          className={cn("mb-2", controlInputClass)}
         />
         <Input
           value={header.title}
           onChange={(e) => handleHeaderChange("title", e.target.value)}
           placeholder="Title"
-          className="mb-2"
+          className={cn("mb-2", controlInputClass)}
         />
         <Input
           value={header.location}
           onChange={(e) => handleHeaderChange("location", e.target.value)}
           placeholder="Location"
-          className="mb-2"
+          className={cn("mb-2", controlInputClass)}
         />
         <Input
           value={header.phone}
           onChange={(e) => handleHeaderChange("phone", e.target.value)}
           placeholder="Phone"
-          className="mb-2"
+          className={cn("mb-2", controlInputClass)}
         />
         <Input
           value={header.email}
           onChange={(e) => handleHeaderChange("email", e.target.value)}
           placeholder="Email"
-          className="mb-2"
+          className={cn("mb-2", controlInputClass)}
         />
         <Input
           value={header.website}
           onChange={(e) => handleHeaderChange("website", e.target.value)}
           placeholder="Website"
-          className="mb-2"
+          className={cn("mb-2", controlInputClass)}
         />
         <Input
           value={header.linkedin}
           onChange={(e) => handleHeaderChange("linkedin", e.target.value)}
           placeholder="LinkedIn"
-          className="mb-2"
+          className={cn("mb-2", controlInputClass)}
         />
         <Input
           value={header.github}
           onChange={(e) => handleHeaderChange("github", e.target.value)}
           placeholder="GitHub"
-          className="mb-2"
+          className={cn("mb-2", controlInputClass)}
         />
 
         <div className="mt-4">
-          <Label className="font-medium mb-2 block">Contact Order</Label>
+          <Label className="mb-2 block text-sm font-semibold text-slate-800">Contact Order</Label>
           <div className="space-y-2">
             {contactOrder.map((contactType, index) => (
-              <div key={contactType} className="flex items-center gap-2 p-2 bg-white rounded border">
-                <span className="flex-1 capitalize">{contactType}</span>
+              <div key={contactType} className="flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3">
+                <span className="flex-1 text-sm font-medium capitalize text-slate-700">{contactType}</span>
                 <div className="flex gap-1">
                   <Button
                     onClick={() => {
@@ -750,6 +858,7 @@ export default function SideScreen({
                     size="sm"
                     variant="outline"
                     disabled={index === 0}
+                    className={iconActionClass}
                   >
                     ↑
                   </Button>
@@ -764,6 +873,7 @@ export default function SideScreen({
                     size="sm"
                     variant="outline"
                     disabled={index === contactOrder.length - 1}
+                    className={iconActionClass}
                   >
                     ↓
                   </Button>
@@ -772,13 +882,23 @@ export default function SideScreen({
             ))}
           </div>
         </div>
-      </div>
+          </SidebarSection>
 
       {sections.objective !== undefined && (
-        <div className="mb-4">
+        <SidebarSection
+          description="Refine the opening paragraph that frames the whole resume."
+          eyebrow="Narrative"
+          icon={UserRound}
+          title="Professional Summary"
+        >
           <Label htmlFor="objective">Professional Summary</Label>
-          <Textarea id="objective" value={sections.objective} onChange={handleObjectiveChange} className="w-full" />
-        </div>
+          <Textarea
+            id="objective"
+            value={sections.objective}
+            onChange={handleObjectiveChange}
+            className={cn("w-full min-h-28 rounded-2xl border-slate-200 bg-white shadow-sm", controlInputClass)}
+          />
+        </SidebarSection>
       )}
 
       {sections.summary !== undefined && (
@@ -788,15 +908,20 @@ export default function SideScreen({
         </div>
       )}
 
-      <div className="mb-4">
+      <SidebarSection
+        description="Tune job entries and bullet points so the strongest proof lands first."
+        eyebrow="Career"
+        icon={BriefcaseBusiness}
+        title="Experience"
+      >
         <div className="flex justify-between items-center mt-4 mb-2">
           <h3 className="font-bold">Experience</h3>
-          <Button onClick={addExperience} size="sm" variant="outline">
+          <Button onClick={addExperience} size="sm" variant="outline" className={cn("rounded-xl", softButtonClass)}>
             <Plus className="h-4 w-4" />
           </Button>
         </div>
         {sections.experience.map((job, index) => (
-          <div key={index} className="mb-4 p-2 bg-white rounded">
+          <div key={index} className="mb-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3">
             <Input
               value={job.title}
               onChange={(e) => handleExperienceChange(index, "title", e.target.value)}
@@ -835,20 +960,25 @@ export default function SideScreen({
                 </Button>
               </div>
             ))}
-            <Button onClick={() => addBullet(index)} size="sm" variant="outline" className="mb-2">
+            <Button onClick={() => addBullet(index)} size="sm" variant="outline" className={cn("mb-2 rounded-xl", softButtonClass)}>
               <Plus className="h-4 w-4 mr-2" /> Add Bullet
             </Button>
-            <Button onClick={() => removeExperience(index)} size="sm" variant="outline" className="w-full">
+            <Button onClick={() => removeExperience(index)} size="sm" variant="outline" className={cn("w-full rounded-xl", softButtonClass)}>
               <Minus className="h-4 w-4 mr-2" /> Remove Experience
             </Button>
           </div>
         ))}
-      </div>
+      </SidebarSection>
 
-      <div className="mb-4">
+      <SidebarSection
+        description="Manage concise proof lists for skills, impact, technical tools, and credentials."
+        eyebrow="Proof"
+        icon={Award}
+        title="Skills & Highlights"
+      >
         <div className="flex justify-between items-center mt-4 mb-2">
           <h3 className="font-bold">Skills</h3>
-          <Button onClick={addCoreCompetency} size="sm" variant="outline">
+          <Button onClick={addCoreCompetency} size="sm" variant="outline" className={cn("rounded-xl", softButtonClass)}>
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -865,12 +995,10 @@ export default function SideScreen({
             </Button>
           </div>
         ))}
-      </div>
 
-      <div className="mb-4">
         <div className="flex justify-between items-center mt-4 mb-2">
           <h3 className="font-bold">Selected Impact</h3>
-          <Button onClick={addSelectedImpact} size="sm" variant="outline">
+          <Button onClick={addSelectedImpact} size="sm" variant="outline" className={cn("rounded-xl", softButtonClass)}>
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -887,12 +1015,10 @@ export default function SideScreen({
             </Button>
           </div>
         ))}
-      </div>
 
-      <div className="mb-4">
         <div className="flex justify-between items-center mt-4 mb-2">
           <h3 className="font-bold">Technical Stack</h3>
-          <Button onClick={addTechnicalStack} size="sm" variant="outline">
+          <Button onClick={addTechnicalStack} size="sm" variant="outline" className={cn("rounded-xl", softButtonClass)}>
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -909,17 +1035,42 @@ export default function SideScreen({
             </Button>
           </div>
         ))}
-      </div>
 
-      <div className="mb-4">
+        <div className="flex justify-between items-center mt-4 mb-2">
+          <h3 className="font-bold">Certifications</h3>
+          <Button onClick={addCertification} size="sm" variant="outline" className={cn("rounded-xl", softButtonClass)}>
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+        {sections.certifications?.map((cert, index) => (
+          <div key={index} className="flex items-center mb-2">
+            <Input
+              value={cert}
+              onChange={(e) => handleCertificationChange(index, e.target.value)}
+              placeholder={`Certification ${index + 1}`}
+              className="flex-grow mr-2"
+            />
+            <Button onClick={() => removeCertification(index)} size="sm" variant="outline">
+              <Minus className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+      </SidebarSection>
+
+      <SidebarSection
+        description="Use project entries for portfolio-style proof with optional links and technology context."
+        eyebrow="Projects"
+        icon={FolderKanban}
+        title="Project Highlights"
+      >
         <div className="flex justify-between items-center mt-4 mb-2">
           <h3 className="font-bold">Projects</h3>
-          <Button onClick={addProject} size="sm" variant="outline">
+          <Button onClick={addProject} size="sm" variant="outline" className={cn("rounded-xl", softButtonClass)}>
             <Plus className="h-4 w-4" />
           </Button>
         </div>
         {sections.projects?.map((project, index) => (
-          <div key={index} className="mb-4 p-2 bg-white rounded">
+          <div key={index} className="mb-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3">
             <Label htmlFor={`project-title-${index}`}>Title</Label>
             <Input
               id={`project-title-${index}`}
@@ -950,7 +1101,7 @@ export default function SideScreen({
                 </Button>
               </div>
             ))}
-            <Button onClick={() => addProjectBullet(index)} size="sm" variant="outline" className="mb-2">
+            <Button onClick={() => addProjectBullet(index)} size="sm" variant="outline" className={cn("mb-2 rounded-xl", softButtonClass)}>
               <Plus className="h-4 w-4 mr-2" /> Add Bullet
             </Button>
             <Label htmlFor={`project-tech-${index}`}>Technologies (optional)</Label>
@@ -969,12 +1120,12 @@ export default function SideScreen({
               placeholder="Project Link"
               className="mb-2"
             />
-            <Button onClick={() => removeProject(index)} size="sm" variant="outline" className="w-full">
+            <Button onClick={() => removeProject(index)} size="sm" variant="outline" className={cn("w-full rounded-xl", softButtonClass)}>
               <Minus className="h-4 w-4 mr-2" /> Remove Project
             </Button>
           </div>
         ))}
-      </div>
+      </SidebarSection>
 
       {sections.availability !== undefined && (
         <div className="mb-4">
@@ -988,15 +1139,20 @@ export default function SideScreen({
         </div>
       )}
 
-      <div className="mb-4">
+      <SidebarSection
+        description="Keep education entries crisp and scan-friendly for the final layout."
+        eyebrow="Background"
+        icon={GraduationCap}
+        title="Education"
+      >
         <div className="flex justify-between items-center mt-4 mb-2">
           <h3 className="font-bold">Education</h3>
-          <Button onClick={addEducation} size="sm" variant="outline">
+          <Button onClick={addEducation} size="sm" variant="outline" className={cn("rounded-xl", softButtonClass)}>
             <Plus className="h-4 w-4" />
           </Button>
         </div>
         {sections.education.map((edu, index) => (
-          <div key={index} className="mb-4 p-2 bg-white rounded">
+          <div key={index} className="mb-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3">
             <Label htmlFor={`degree-${index}`}>Degree</Label>
             <Input
               id={`degree-${index}`}
@@ -1021,37 +1177,19 @@ export default function SideScreen({
               placeholder="Location"
               className="mb-2"
             />
-            <Button onClick={() => removeEducation(index)} size="sm" variant="outline" className="w-full">
+            <Button onClick={() => removeEducation(index)} size="sm" variant="outline" className={cn("w-full rounded-xl", softButtonClass)}>
               <Minus className="h-4 w-4 mr-2" /> Remove Education
             </Button>
           </div>
         ))}
-      </div>
+      </SidebarSection>
 
-      <div className="mb-4">
-        <div className="flex justify-between items-center mt-4 mb-2">
-          <h3 className="font-bold">Certifications</h3>
-          <Button onClick={addCertification} size="sm" variant="outline">
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-        {sections.certifications?.map((cert, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <Input
-              value={cert}
-              onChange={(e) => handleCertificationChange(index, e.target.value)}
-              placeholder={`Certification ${index + 1}`}
-              className="flex-grow mr-2"
-            />
-            <Button onClick={() => removeCertification(index)} size="sm" variant="outline">
-              <Minus className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
-      </div>
-
-      <div className="mb-4">
-        <h3 className="font-bold mt-4 mb-2">Print Settings</h3>
+      <SidebarSection
+        description="Fine-tune page density, spacing, and typography for the printed version."
+        eyebrow="Output"
+        icon={SlidersHorizontal}
+        title="Print Settings"
+      >
         <div className="space-y-4">
           <div>
             <Label htmlFor="print-margin">Print Margin</Label>
@@ -1139,6 +1277,8 @@ export default function SideScreen({
             />
             <div className="text-sm text-gray-500 mt-1">{printSettings.bulletFontSize}px</div>
           </div>
+        </div>
+      </SidebarSection>
         </div>
       </div>
     </div>

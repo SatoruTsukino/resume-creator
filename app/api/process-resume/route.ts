@@ -146,6 +146,57 @@ function extractJsonPayload(rawText: string) {
   return trimmed
 }
 
+function stripLeadingBulletMarker(value: string) {
+  return value.trim().replace(/^[-*•◦▪‣]+\s*/, "")
+}
+
+function normalizeStringList(values: unknown) {
+  if (!Array.isArray(values)) {
+    return []
+  }
+
+  return values
+    .map((value) => (typeof value === "string" ? stripLeadingBulletMarker(value) : ""))
+    .filter(Boolean)
+}
+
+function normalizeResumeData(data: any) {
+  if (!data || typeof data !== "object") {
+    return data
+  }
+
+  const sections = data.sections && typeof data.sections === "object" ? data.sections : {}
+
+  return {
+    ...data,
+    sections: {
+      ...sections,
+      coreCompetencies: normalizeStringList(sections.coreCompetencies),
+      selectedImpact: normalizeStringList(sections.selectedImpact),
+      certifications: normalizeStringList(sections.certifications),
+      technicalStack: normalizeStringList(sections.technicalStack),
+      experience: Array.isArray(sections.experience)
+        ? sections.experience.map((job: any) => ({
+            ...job,
+            bullets: normalizeStringList(job?.bullets),
+          }))
+        : [],
+      projects: Array.isArray(sections.projects)
+        ? sections.projects.map((project: any) => ({
+            ...project,
+            bullets: normalizeStringList(project?.bullets),
+          }))
+        : [],
+      education: Array.isArray(sections.education)
+        ? sections.education.map((education: any) => ({
+            ...education,
+            notes: normalizeStringList(education?.notes),
+          }))
+        : [],
+    },
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { resumeText } = await request.json()
@@ -220,7 +271,7 @@ export async function POST(request: Request) {
         return Response.json({ error: "No response from Gemini" }, { status: 502 })
       }
 
-      const parsedData = JSON.parse(extractJsonPayload(textContent))
+      const parsedData = normalizeResumeData(JSON.parse(extractJsonPayload(textContent)))
 
       return Response.json({ success: true, data: parsedData })
     } finally {

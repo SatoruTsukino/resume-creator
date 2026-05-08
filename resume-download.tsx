@@ -10,43 +10,57 @@ export default function ResumeDownload() {
   const handlePrint = () => {
     const printContent = document.querySelector(".resume-pages") as HTMLElement
     if (printContent) {
-      const printWindow = window.open("", "_blank")
-      if (printWindow) {
-        // Copy the entire document's styles
-        const styles = Array.from(document.styleSheets)
-          .map((styleSheet) => {
-            try {
-              return Array.from(styleSheet.cssRules)
-                .map((rule) => rule.cssText)
-                .join("\n")
-            } catch (e) {
-              console.log("Error accessing styleSheet", e)
-              return ""
-            }
-          })
-          .join("\n")
+      const styles = Array.from(document.styleSheets)
+        .map((styleSheet) => {
+          try {
+            return Array.from(styleSheet.cssRules)
+              .map((rule) => rule.cssText)
+              .join("\n")
+          } catch (e) {
+            console.log("Error accessing styleSheet", e)
+            return ""
+          }
+        })
+        .join("\n")
 
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <style>${styles}</style>
-            </head>
-            <body>
-              ${printContent.outerHTML}
-            </body>
-          </html>
-        `)
-        printWindow.document.close()
-        printWindow.focus()
+      const iframe = document.createElement("iframe")
+      iframe.style.position = "fixed"
+      iframe.style.right = "0"
+      iframe.style.bottom = "0"
+      iframe.style.width = "0"
+      iframe.style.height = "0"
+      iframe.style.border = "0"
+      iframe.setAttribute("aria-hidden", "true")
+      document.body.appendChild(iframe)
 
-        // Wait for content to load before printing
-        printWindow.onload = () => {
-          printWindow.print()
-          printWindow.close()
-        }
-      } else {
-        console.error("Failed to open print window")
+      const iframeDoc = iframe.contentWindow?.document
+      if (!iframeDoc || !iframe.contentWindow) {
+        document.body.removeChild(iframe)
+        console.error("Failed to create print frame")
+        return
+      }
+
+      iframeDoc.open()
+      iframeDoc.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Resume</title>
+            <style>${styles}</style>
+          </head>
+          <body>
+            ${printContent.outerHTML}
+          </body>
+        </html>
+      `)
+      iframeDoc.close()
+
+      iframe.onload = () => {
+        iframe.contentWindow?.focus()
+        iframe.contentWindow?.print()
+        window.setTimeout(() => {
+          document.body.removeChild(iframe)
+        }, 1000)
       }
     } else {
       console.error("Resume content not found")
