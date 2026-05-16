@@ -238,24 +238,7 @@ export default function ResumePage() {
                     <strong>{job.company}</strong> | {job.location} | {job.date}
                   </p>
                 </div>
-                {/* Job descriptions */}
-                {index === 0 && (
-                  <p className="text-gray-700 mb-2" style={{ fontSize: `${printSettings.fontSize}px` }}>
-                    Oversaw backend operations, digital tools, and enrollment systems for a large after-school program
-                    serving hundreds of students.
-                  </p>
-                )}
-                {index === 1 && (
-                  <p className="text-gray-700 mb-2" style={{ fontSize: `${printSettings.fontSize}px` }}>
-                    Designs and delivers internal tools and websites for artists, educators, and small teams using
-                    modern frontend frameworks and automation platforms.
-                  </p>
-                )}
-                {index === 2 && (
-                  <p className="text-gray-700 mb-2" style={{ fontSize: `${printSettings.fontSize}px` }}>
-                    Helped small teams digitize operations using low-code platforms.
-                  </p>
-                )}
+
                 <div className="space-y-0.5">
                   {job.bullets.map((bullet, bulletIndex) => (
                     <div key={bulletIndex} className="flex items-start">
@@ -403,7 +386,6 @@ export default function ResumePage() {
           sections.experience.forEach((job, index) => {
             const titleHeight = (printSettings.fontSize + 1) * printSettings.lineSpacing
             const companyHeight = printSettings.fontSize * printSettings.lineSpacing
-            const descriptionHeight = printSettings.fontSize * printSettings.lineSpacing * 2 // Assuming 2 lines for description
             const bulletsHeight = job.bullets.length * (printSettings.bulletFontSize * printSettings.lineSpacing + 2)
             const spacing = printSettings.sectionSpacing / 2
 
@@ -411,7 +393,7 @@ export default function ResumePage() {
               type: "subsection",
               sectionKey: "experience",
               content: { job, index },
-              height: titleHeight + companyHeight + descriptionHeight + bulletsHeight + spacing,
+              height: titleHeight + companyHeight + bulletsHeight + spacing,
             })
           })
           break
@@ -589,23 +571,7 @@ export default function ResumePage() {
                   <strong>{job.company}</strong> | {job.location} | {job.date}
                 </p>
               </div>
-              {index === 0 && (
-                <p className="text-gray-700 mb-2" style={{ fontSize: `${printSettings.fontSize}px` }}>
-                  Oversaw backend operations, digital tools, and enrollment systems for a large after-school program
-                  serving hundreds of students.
-                </p>
-              )}
-              {index === 1 && (
-                <p className="text-gray-700 mb-2" style={{ fontSize: `${printSettings.fontSize}px` }}>
-                  Designs and delivers internal tools and websites for artists, educators, and small teams using modern
-                  frontend frameworks and automation platforms.
-                </p>
-              )}
-              {index === 2 && (
-                <p className="text-gray-700 mb-2" style={{ fontSize: `${printSettings.fontSize}px` }}>
-                  Helped small teams digitize operations using low-code platforms.
-                </p>
-              )}
+
               <div className="space-y-0.5">
                 {job.bullets.map((bullet: string, bulletIndex: number) => (
                   <div key={bulletIndex} className="flex items-start">

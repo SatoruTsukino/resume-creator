@@ -25,7 +25,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { toast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
 
@@ -221,6 +221,17 @@ export default function SideScreen({
 
   const [resumeText, setResumeText] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("resumeDraft")
+      if (stored) {
+        setSavedData(JSON.parse(stored))
+      }
+    } catch (err) {
+      console.error("Failed to load draft", err)
+    }
+  }, [])
 
   const sectionNames = {
     objective: "Professional Summary",
@@ -589,12 +600,18 @@ export default function SideScreen({
   }
 
   const saveCurrentText = () => {
-    setSavedData({
+    const dataToSave = {
       header: { ...header },
       sections: { ...sections },
       sectionVisibility: { ...sectionVisibility },
       sectionOrder: [...sectionOrder],
-    })
+    }
+    setSavedData(dataToSave)
+    try {
+      localStorage.setItem("resumeDraft", JSON.stringify(dataToSave))
+    } catch (err) {
+      console.error("Failed to save draft", err)
+    }
     toast({
       title: "Content saved",
       description: "Your resume content has been saved. You can restore it later if needed.",
