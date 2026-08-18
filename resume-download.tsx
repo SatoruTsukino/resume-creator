@@ -10,10 +10,25 @@ export default function ResumeDownload() {
 
   const handleDownloadPdf = async () => {
     setIsGeneratingPdf(true)
+
+    // The preview is rendered inside `.resume-wrapper` with a CSS
+    // `transform: scale(zoom/100)`. html2canvas mis-measures elements that
+    // live inside a scaled ancestor, which is what causes the crowded /
+    // overlapping text. Neutralize the transform for the duration of the
+    // capture, then restore it exactly as it was.
+    const wrapper = document.querySelector(".resume-wrapper") as HTMLElement | null
+    const previousTransform = wrapper?.style.transform ?? ""
+    const previousTransition = wrapper?.style.transition ?? ""
+
     try {
       const resume = document.querySelector(".resume-pages") as HTMLElement | null
       if (!resume) {
         throw new Error("Resume content not found")
+      }
+
+      if (wrapper) {
+        wrapper.style.transition = "none"
+        wrapper.style.transform = "none"
       }
 
       // Each rendered page is a fixed 816px x 1056px (8.5in x 11in @ 96dpi) block.
@@ -35,11 +50,23 @@ export default function ResumeDownload() {
       const pageHeight = pdf.internal.pageSize.getHeight()
 
       for (let i = 0; i < targets.length; i++) {
-        const canvas = await html2canvas(targets[i], {
+        const target = targets[i]
+        // Capture at the page's true, unscaled dimensions so text lays out
+        // exactly as designed instead of being squeezed by the zoom scale.
+        const width = target.offsetWidth || 816
+        const height = target.offsetHeight || 1056
+
+        const canvas = await html2canvas(target, {
           scale: 2, // higher resolution for crisp text
           useCORS: true,
           backgroundColor: "#ffffff",
           logging: false,
+          width,
+          height,
+          windowWidth: width,
+          windowHeight: height,
+          scrollX: 0,
+          scrollY: 0,
         })
 
         const imgData = canvas.toDataURL("image/png")
@@ -69,6 +96,11 @@ export default function ResumeDownload() {
       console.error("PDF export failed:", error)
       alert("Could not export PDF. Please try again.")
     } finally {
+      // Always restore the on-screen zoom transform.
+      if (wrapper) {
+        wrapper.style.transform = previousTransform
+        wrapper.style.transition = previousTransition
+      }
       setIsGeneratingPdf(false)
     }
   }
