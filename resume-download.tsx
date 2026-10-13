@@ -137,7 +137,7 @@ export default function ResumeDownload() {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-center justify-center p-4 bg-white rounded-lg shadow-sm">
+    <div className="print-controls flex flex-col sm:flex-row gap-4 items-center justify-center p-4 bg-white rounded-lg shadow-sm">
       <Button
         onClick={handleDownloadPdf}
         disabled={isGeneratingPdf}

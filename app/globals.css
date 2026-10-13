@@ -132,6 +132,25 @@
     padding: 0;
   }
 
+  .print-controls,
+  .zoom-controls {
+    display: none !important;
+  }
+
+  body > * {
+    visibility: hidden;
+  }
+
+  .resume-pages,
+  .resume-pages * {
+    visibility: visible;
+  }
+
+  .resume-pages {
+    position: absolute;
+    inset: 0;
+  }
+
   .page-content {
     width: 8.5in !important;
     margin: 0 !important;

@@ -736,7 +736,7 @@ export default function ResumePage() {
               </div>
             </div>
           </div>
-          <div className="fixed bottom-4 right-4 z-50 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border flex flex-col items-center gap-2">
+          <div className="zoom-controls fixed bottom-4 right-4 z-50 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border flex flex-col items-center gap-2">
             <Label htmlFor="zoom-control" className="text-sm font-medium">
               Zoom: {zoom}%
             </Label>
