@@ -260,7 +260,9 @@ export default function SideScreen({
   }
 
   const processResumeWithGemini = async () => {
-    if (!resumeText.trim()) {
+    const textToProcess = resumeText.trim()
+
+    if (!textToProcess) {
       toast({
         title: "No resume text",
         description: "Please paste your resume text before processing.",
@@ -281,7 +283,7 @@ export default function SideScreen({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ resumeText }),
+        body: JSON.stringify({ resumeText: textToProcess }),
         signal: controller.signal,
       })
 
@@ -301,7 +303,11 @@ export default function SideScreen({
 
       
 
-      if (result.success && result.data) {
+      if (!result?.success || !result?.data) {
+        throw new Error("Gemini returned an incomplete response. Please try again.")
+      }
+
+      {
         // Update header
         setHeader({
           name: result.data.header.name || "",
@@ -690,11 +696,13 @@ export default function SideScreen({
           placeholder="Paste your complete resume text here..."
           className="w-full h-32 mb-3 text-sm"
         />
-        <Button
-          onClick={processResumeWithGemini}
-          disabled={isProcessing || !resumeText.trim()}
-          className="w-full rounded-xl bg-gradient-to-r from-sky-600 via-cyan-600 to-emerald-600 text-white shadow-lg shadow-cyan-200 hover:from-sky-700 hover:via-cyan-700 hover:to-emerald-700"
-        >
+  <Button
+  type="button"
+  onClick={processResumeWithGemini}
+  disabled={isProcessing || !resumeText.trim()}
+  aria-busy={isProcessing}
+  className="w-full rounded-xl bg-gradient-to-r from-sky-600 via-cyan-600 to-emerald-600 text-white shadow-lg shadow-cyan-200 hover:from-sky-700 hover:via-cyan-700 hover:to-emerald-700"
+  >
           {isProcessing ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

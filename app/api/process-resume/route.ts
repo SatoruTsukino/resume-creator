@@ -205,75 +205,94 @@ export async function POST(request: Request) {
       return Response.json({ error: "Resume text is required" }, { status: 400 })
     }
 
-    const apiKey =
-      process.env.GEMINI_API_KEY ??
-      process.env.GOOGLE_GENERATIVE_AI_API_KEY ??
-      process.env.GOOGLE_API_KEY
-    if (!apiKey) {
+    const apiKeys = [
+      process.env.GEMINI_API_KEY_2,
+      process.env.GEMINI_API_KEY,
+      process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+      process.env.GOOGLE_API_KEY,
+    ].filter((key): key is string => typeof key === "string" && key.trim().length > 0)
+
+    if (apiKeys.length === 0) {
       return Response.json(
         { error: "Server is not configured with a Gemini API key." },
         { status: 500 }
       )
     }
+
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS)
 
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey,
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: `${SYSTEM_PROMPT}\n\nRESUME TEXT:\n${resumeText}` }],
-              },
-            ],
-            generationConfig: {
-              temperature: 0,
-              responseMimeType: "application/json",
-              responseSchema: resumeSchemaDefinition,
+      let lastErrorMessage = "Gemini API request failed"
+      let lastErrorStatus = 502
+
+      for (const apiKey of apiKeys) {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey,
             },
-          }),
-          signal: controller.signal,
-          cache: "no-store",
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        let errorMessage = "Gemini API request failed"
-
-        try {
-          const errorData = JSON.parse(errorText)
-          errorMessage = errorData?.error?.message ?? errorMessage
-          console.error("[v0] Gemini API error:", errorData)
-        } catch {
-          console.error("[v0] Gemini API error:", errorText)
-          if (errorText.trim()) {
-            errorMessage = errorText
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: "user",
+                  parts: [{ text: `${SYSTEM_PROMPT}\n\nRESUME TEXT:\n${resumeText}` }],
+                },
+              ],
+              generationConfig: {
+                temperature: 0,
+                responseMimeType: "application/json",
+                responseSchema: resumeSchemaDefinition,
+              },
+            }),
+            signal: controller.signal,
+            cache: "no-store",
           }
+        )
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          let errorMessage = "Gemini API request failed"
+
+          try {
+            const errorData = JSON.parse(errorText)
+            errorMessage = errorData?.error?.message ?? errorMessage
+            console.error("[v0] Gemini API error:", errorData)
+          } catch {
+            console.error("[v0] Gemini API error:", errorText)
+            if (errorText.trim()) {
+              errorMessage = errorText
+            }
+          }
+
+          lastErrorMessage = errorMessage
+          lastErrorStatus = response.status
+
+          // Auth/permission failures may be key-specific — try the next key.
+          if (response.status === 400 || response.status === 401 || response.status === 403) {
+            continue
+          }
+
+          return Response.json({ error: errorMessage }, { status: response.status })
         }
 
-        return Response.json({ error: errorMessage }, { status: response.status })
+        const result = await response.json()
+        const textContent = result?.candidates?.[0]?.content?.parts?.[0]?.text
+
+        if (!textContent) {
+          console.error("[v0] Gemini response missing text:", result)
+          return Response.json({ error: "No response from Gemini" }, { status: 502 })
+        }
+
+        const parsedData = normalizeResumeData(JSON.parse(extractJsonPayload(textContent)))
+
+        return Response.json({ success: true, data: parsedData })
       }
 
-      const result = await response.json()
-      const textContent = result?.candidates?.[0]?.content?.parts?.[0]?.text
-
-      if (!textContent) {
-        console.error("[v0] Gemini response missing text:", result)
-        return Response.json({ error: "No response from Gemini" }, { status: 502 })
-      }
-
-      const parsedData = normalizeResumeData(JSON.parse(extractJsonPayload(textContent)))
-
-      return Response.json({ success: true, data: parsedData })
+      return Response.json({ error: lastErrorMessage }, { status: lastErrorStatus })
     } finally {
       clearTimeout(timeoutId)
     }
